@@ -21,7 +21,10 @@
     My URLs
     <% for(let short in urls) { %>
     <li><%= short %> : <a href='#' ><%= urls[short] %></a>
-          <form method="POST" action="/urls/<%= short %>/delete">
+      <form method="POST" action="/urls/<%= short %>/edit">
+        <button type="submit" class="btn btn-primary">Edit</button>
+      </form>
+      <form method="POST" action="/urls/<%= short %>/delete">
         <button type="submit" class="btn btn-primary">Delete</button>
       </form>
       </li>
