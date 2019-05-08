@@ -28,16 +28,32 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 app.get("/urls/:shortURL", (req, res) => {
-  // console.log(req)
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
+app.get("/u/:shortURL", (req, res) => {
+    const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  console.log(req.body);
+  var shortURL = generateRandomString();
+  var longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;        //where is it storing to? not showing in the database in this file.
+  res.redirect("urls/" + shortURL);
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+function generateRandomString() {  //so here is a chance that it generates 2 identical number?
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < 6; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
