@@ -36,19 +36,27 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log(req.params.shortURL);
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls/");
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body);
   var shortURL = generateRandomString();
   var longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;        //where is it storing to? not showing in the database in this file.
-  res.redirect("urls/" + shortURL);
+  urlDatabase[shortURL] = longURL;
+  res.redirect("/urls/" + shortURL);
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-function generateRandomString() {  //so here is a chance that it generates 2 identical number?
+function generateRandomString() {
    var result           = '';
    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
    var charactersLength = characters.length;
