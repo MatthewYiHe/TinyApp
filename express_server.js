@@ -10,13 +10,29 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 
 
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
+
+
 
 app.get("/",(req, res) => {
-  response.send("Hello!");
+  res.send("Hello!");
 });
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -43,6 +59,10 @@ app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
 
 
 app.post("/login", (req, res) => {
@@ -54,7 +74,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls/");
 });
 app.post("/urls/:shortURL/edit", (req, res) => {
-  let shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL
   res.redirect("/urls/" + shortURL);
 });
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -64,17 +84,31 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 app.post("/urls/:shortURL/update", (req, res) => {
   console.log(req.body);
-  let shortURL = req.params.shortURL;
-  let longURL = req.body.longURL;
+  const shortURL = req.params.shortURL;
+  const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect("/urls/");
 });
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  let shortURL = generateRandomString();
-  let longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect("/urls/" + shortURL);
+});
+app.post("/register", (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  const userInfo = {
+    id,
+    email,
+    password
+  };
+  users.id = userInfo;
+  // console.log(users);
+  res.cookie("user_id", id);
+  res.redirect("/urls");
 });
 
 
@@ -84,8 +118,8 @@ app.listen(PORT, () => {
 });
 
 function generateRandomString() {
-   let result           = '';
-   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   let result = '';
+   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
    let charactersLength = characters.length;
    for ( var i = 0; i < 6; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
