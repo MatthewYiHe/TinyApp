@@ -70,7 +70,19 @@ app.get("/login", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-  res.redirect("/login");s
+  // const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  const userId = emailLookup(email);
+  console.log("loging in",email,emailLookup(email))
+  if (!emailLookup(email)){
+    res.render("403");
+  } else if (password !== users[userId].password){
+    res.render("403");
+  } else {
+    res.cookie("user_id", users[userId].id);
+    res.redirect("/urls");
+  }
 });
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
@@ -117,7 +129,6 @@ app.post("/register", (req, res) => {
     res.cookie("user_id", id);
     res.redirect("/urls");
   }
-
 });
 
 
