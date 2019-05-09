@@ -42,17 +42,18 @@ app.get("/hello", (req, res) => {
 });
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-                       username: req.cookies["username"]};
+                       user: users[req.cookies["user_id"]]};
+  // console.log(users[req.cookies["user_id"]])
   res.render("urls_index", templateVars);
 });
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies["username"]};
+  let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_new", templateVars);
 });
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL,
                        longURL: urlDatabase[req.params.shortURL],
-                       username: req.cookies["username"]};
+                       user: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
@@ -62,19 +63,21 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register");
 });
+app.get("/login", (req, res) => {
+  res.render("login");
+});
 
 
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls/");
+  res.redirect("/login");s
 });
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls/");
 });
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
   res.redirect("/urls/" + shortURL);
 });
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -105,10 +108,16 @@ app.post("/register", (req, res) => {
     email,
     password
   };
-  users.id = userInfo;
-  // console.log(users);
-  res.cookie("user_id", id);
-  res.redirect("/urls");
+  if (!email || !password){
+    res.render("404");
+  } else if (emailLookup(email)){
+    res.render("404");
+  } else {
+    users[id] = userInfo;
+    res.cookie("user_id", id);
+    res.redirect("/urls");
+  }
+
 });
 
 
@@ -116,6 +125,18 @@ app.post("/register", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+
+function emailLookup(email){
+  for (userId in users){
+    if (email === users[userId].email){
+      return userId;
+    }
+  }
+}
+
 
 function generateRandomString() {
    let result = '';
