@@ -31,11 +31,18 @@ const users = {
 
 
 
+
 app.get("/",(req, res) => {
-  res.send("Hello!");
+  res.send("Hello! & Welcome!");
 });
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  let templateVars = {user: users[req.cookies["user_id"]]};
+  const userId = req.cookies["user_id"];
+    if (userId){
+     res.json(urlDatabase);
+  } else {
+     res.redirect("/login");
+  }
 });
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
@@ -43,21 +50,42 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
                        user: users[req.cookies["user_id"]]};
-  res.render("urls_index", templateVars);
+  const userId = req.cookies["user_id"];
+    if (userId){
+     res.render("urls_index", templateVars);
+  } else {
+     res.redirect("/login");
+  }
 });
 app.get("/urls/new", (req, res) => {
-  let templateVars = {user: users[req.cookies["user_id"]]};
-  res.render("urls_new", templateVars);
+    let templateVars = {user: users[req.cookies["user_id"]]};
+    const userId = req.cookies["user_id"];
+    if (userId){
+     res.render("urls_new", templateVars);
+  } else {
+     res.redirect("/login");
+  }
 });
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL,
                        longURL: urlDatabase[req.params.shortURL],
                        user: users[req.cookies["user_id"]]};
-  res.render("urls_show", templateVars);
+  const userId = req.cookies["user_id"];
+    if (userId){
+     res.render("urls_show", templateVars);
+  } else {
+     res.redirect("/login");
+  }
 });
 app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  let templateVars = {user: users[req.cookies["user_id"]]};
+  const userId = req.cookies["user_id"];
+    if (userId){
+     res.render("urls_show", templateVars);
+  } else {
+     res.redirect(longURL);
+  }
 });
 app.get("/register", (req, res) => {
     let templateVars = {user: users[req.cookies["user_id"]]};
