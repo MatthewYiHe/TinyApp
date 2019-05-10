@@ -1,8 +1,9 @@
             <h1>TinyApp</h1>
 
-            <h5><a href='/urls/new' >Create New TinyURL</a></h5>
+
             <% if ( user ){ %>
-              <%= user.email %>
+              Logged In As: <%= user.email %>
+              <h5><a href='/urls/new' >Create New TinyURL</a></h5>
               <form method="POST" action="/logout">
                 <button type="submit" class="btn btn-primary">Logout</button>
               </form>

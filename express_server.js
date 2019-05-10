@@ -43,7 +43,6 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
                        user: users[req.cookies["user_id"]]};
-  // console.log(users[req.cookies["user_id"]])
   res.render("urls_index", templateVars);
 });
 app.get("/urls/new", (req, res) => {
@@ -61,16 +60,17 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 app.get("/register", (req, res) => {
-  res.render("register");
+    let templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("register", templateVars);
 });
 app.get("/login", (req, res) => {
-  res.render("login");
+    let templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("login", templateVars);
 });
 
 
 
 app.post("/login", (req, res) => {
-  // const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
   const userId = emailLookup(email);
