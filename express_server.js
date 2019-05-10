@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+
 
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -86,18 +88,18 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 });
 app.get("/u/:shortURL", (req, res) => {
-    const longURL = urlDatabase[req.params.shortURL].longURL;
-     res.redirect(longURL);
+   const longURL = urlDatabase[req.params.shortURL].longURL;
+   res.redirect(longURL);
 });
 app.get("/register", (req, res) => {
-    let templateVars = {user: users[req.cookies["user_id"]]};
+  let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("register", templateVars);
 });
 app.get("/login", (req, res) => {
-    let templateVars = {user: users[req.cookies["user_id"]]};
+  let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("login", templateVars);
 });
-app.get("/id", (req, res) => {
+  app.get("/id", (req, res) => {
   res.json(users);
 });
 
@@ -108,10 +110,9 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const userId = emailLookup(email);
-  // console.log("loging in",email,emailLookup(email))
   if (!emailLookup(email)){
     res.render("403");
-  } else if (password !== users[userId].password){
+  } else if (!bcrypt.compareSync(password, users[userId].password)){
     res.render("403");
   } else {
     res.cookie("user_id", users[userId].id);
@@ -161,10 +162,11 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const userInfo = {
     id,
     email,
-    password
+    password: hashedPassword
   };
   if (!email || !password){
     res.render("404");
