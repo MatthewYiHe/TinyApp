@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
@@ -13,8 +13,11 @@ app.use(cookieSession({
   name: 'session',
   keys: ["matthew"]
 }));
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const urlDatabase = {
     b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -33,7 +36,37 @@ const users = {
   }
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function emailLookup(email){
+  for (userId in users){
+    if (email === users[userId].email){
+      return userId;
+    }
+  }
+}
+
+function generateRandomString() {
+   let result = '';
+   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   let charactersLength = characters.length;
+   for ( var i = 0; i < 6; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
+function urlsForUser(id){
+  let arrURL = [];
+  for (let shortURL in urlDatabase){
+    if(id === urlDatabase[shortURL].userID){
+      arrURL.push(shortURL);
+    }
+  }
+  return arrURL;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -41,13 +74,13 @@ app.get("/",(req, res) => {
   res.send("Hello! & Welcome!");
 });
 app.get("/urls.json", (req, res) => {
-  // let templateVars = {user: users[req.session.user_id]};
-  // const userId = req.session.user_id;
-    // if (userId){
+  let templateVars = {user: users[req.session.user_id]};
+  const userId = req.session.user_id;
+    if (userId){
      res.json(urlDatabase);
-  // } else {
-  //    res.redirect("/login");
-  // }
+  } else {
+     res.redirect("/login");
+  }
 });
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
@@ -60,7 +93,6 @@ app.get("/urls", (req, res) => {
       obj[longURL] = urlDatabase[longURL];
       return obj;
     }, {});
-    // console.log(filtereDatabase);
   let templateVars = { urls: filtereDatabase,
                        user: users[req.session.user_id]};
   const userId = req.session.user_id;
@@ -80,13 +112,16 @@ app.get("/urls/new", (req, res) => {
   }
 });
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL,
+  let shortURL = req.params.shortURL;
+  let templateVars = { shortURL,
                        longURL: urlDatabase[req.params.shortURL].longURL,
                        user: users[req.session.user_id]};
   const userId = req.session.user_id;
-    if (userId){
+    if (urlDatabase[shortURL].userID !== userId){
+      res.render("403");
+    } else if (userId){
      res.render("urls_show", templateVars);
-  } else {
+    } else {
      res.redirect("/login");
   }
 });
@@ -105,6 +140,8 @@ app.get("/login", (req, res) => {
   app.get("/id", (req, res) => {
   res.json(users);
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -181,40 +218,3 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
   }
 });
-
-
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
-
-
-
-function emailLookup(email){
-  for (userId in users){
-    if (email === users[userId].email){
-      return userId;
-    }
-  }
-}
-
-function generateRandomString() {
-   let result = '';
-   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   let charactersLength = characters.length;
-   for ( var i = 0; i < 6; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
-}
-
-function urlsForUser(id){
-  let arrURL = [];
-  for (let shortURL in urlDatabase){
-    if(id === urlDatabase[shortURL].userID){
-      arrURL.push(shortURL);
-    }
-  }
-  return arrURL
-}

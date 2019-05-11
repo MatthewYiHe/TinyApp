@@ -9,6 +9,7 @@
 
   <ul>
     My URLs
+    <h5><a href='/urls/new' >Create New TinyURL</a></h5>
     <% for(let short in urls) { %>
     <li><%= short %> : <a href='#' ><%= urls[short].longURL %></a>
       <form method="POST" action="/urls/<%= short %>/edit">
