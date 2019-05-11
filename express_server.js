@@ -164,7 +164,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls/");
 });
 app.post("/urls/:shortURL/edit", (req, res) => {
-    let shortURL = req.params.shortURL;
+  const shortURL = req.params.shortURL;
   if(req.session.user_id === urlDatabase[shortURL].userID){
     res.redirect("/urls/" + shortURL);
   } else {
