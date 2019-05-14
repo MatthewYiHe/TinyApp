@@ -13,9 +13,6 @@ app.use(cookieSession({
   name: 'session',
   keys: ["matthew"]
 }));
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
 
 
 
@@ -76,19 +73,16 @@ function urlsForUser(id){  // find all the urls from a specific user, and list t
 // get section
 
 app.get("/",(req, res) => {
-  res.send("Hello! & Welcome!");
+  res.redirect("/login");
 });
 app.get("/urls.json", (req, res) => {
   let templateVars = {user: users[req.session.user_id]};
   const userId = req.session.user_id;
     if (userId){
-     res.json(urlDatabase);  // only let user log in and see the database if he is registered
+  res.json(urlDatabase);  // only let user log in and see the database if he is registered
   } else {
      res.redirect("/login");
   }
-});
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 app.get("/urls", (req, res) => {
   let filteredURL = urlsForUser(req.session.user_id);
@@ -131,7 +125,13 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 });
 app.get("/u/:shortURL", (req, res) => {
-   const longURL = urlDatabase[req.params.shortURL].longURL;
+   let shortURL = req.params.shortURL;
+   const longURL = urlDatabase[shortURL].longURL;
+   console.log(shortURL)
+   console.log(longURL)
+   if (!longURL){
+    res.render("403")
+   }
    res.redirect(longURL);
 });
 app.get("/register", (req, res) => {
@@ -221,4 +221,9 @@ app.post("/register", (req, res) => { // registers the user and encrypt the pass
     req.session.user_id = id;
     res.redirect("/urls");
   }
+});
+
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
